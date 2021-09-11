@@ -40,4 +40,6 @@ DATA_JUL2017 <- DATA_JUL2017 %>%
 DATA_JUL2017_corte<- DATA_JUL2017 %>% 
   select(host_id_2017, price_2017_pe, room_type_2017, latitude, longitude)
 
+
+HOLA
   
