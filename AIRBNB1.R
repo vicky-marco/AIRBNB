@@ -49,7 +49,7 @@ DATA_NOV2015_corte <- DATA_NOV2015_corte %>%
   filter(!is.na(latitude), !is.na(longitude)) %>% 
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 
-DATA_JUL2017_corte <- DATA_JUL2017_corte%>% 
+DATA_JUL2017_corte <- DATA_JUL2017_corte %>% 
   filter(!is.na(latitude), !is.na(longitude)) %>% 
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
 
@@ -57,9 +57,39 @@ BASE_CONS <-st_join (DATA_AB2019_corte, DATA_JUL2017_corte)
 
 BASE_CONS <- st_join (BASE_CONS, DATA_NOV2015_corte)
 
+BASE_CONS <- BASE_CONS %>% 
+  filter(!is.na(latitude), !is.na(longitude)) %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+
 BASE_CONS_filtrada <- BASE_CONS %>% 
   filter(!is.na(host_id_2017), !is.na(price_2017_pe), !is.na(host_id_2015), !is.na(price_2015_dol))
 
+BARRIOS <- read_sf("https://raw.githubusercontent.com/SSoubie/MEU-Hackers/main/Datasets/mapaCABA.geojson") 
+
+st_crs(BARRIOS)
+
+BARRIOS <-st_transform(BARRIOS, crs=st_crs(BASE_CONS))
+
+BASE_CONS_BARRIOS <- st_join(BASE_CONS, BARRIOS)
+
+
+DATA_AB2019_corte <- DATA_AB2019_corte %>% 
+  filter(!is.na(price_2019_pe)) %>% 
+  mutate(precio=str_sub(price_2019_pe, 2,6)) %>% 
+  mutate(precio2=str_replace(precio, ",", ""))
+
+DATA_AB2019_corte <- DATA_AB2019_corte %>% 
+  mutate(precio3=(as.numeric(precio2)/42.95))
+
+DATA_AB2019_corte <- st_join(DATA_AB2019_corte, BARRIOS)
+
+CANT_BARRIO_2019 <- DATA_AB2019_corte %>% 
+  group_by(barrio) %>% 
+  summarise(cantidad_2019=n())
+
+VALOR_BARRIO_2019 <- DATA_AB2019_corte %>% 
+  group_by(barrio) %>% 
+  summarise(media_precio=mean(precio3))
 
 
 
