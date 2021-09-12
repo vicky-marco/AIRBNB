@@ -41,5 +41,25 @@ DATA_JUL2017_corte<- DATA_JUL2017 %>%
   select(host_id_2017, price_2017_pe, room_type_2017, latitude, longitude)
 
 
-HOLA
+DATA_AB2019_corte <- DATA_AB2019_corte %>% 
+  filter(!is.na(latitude), !is.na(longitude)) %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
   
+DATA_NOV2015_corte <- DATA_NOV2015_corte %>% 
+  filter(!is.na(latitude), !is.na(longitude)) %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+
+DATA_JUL2017_corte <- DATA_JUL2017_corte%>% 
+  filter(!is.na(latitude), !is.na(longitude)) %>% 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+
+BASE_CONS <-st_join (DATA_AB2019_corte, DATA_JUL2017_corte)
+
+BASE_CONS <- st_join (BASE_CONS, DATA_NOV2015_corte)
+
+BASE_CONS_filtrada <- BASE_CONS %>% 
+  filter(!is.na(host_id_2017), !is.na(price_2017_pe), !is.na(host_id_2015), !is.na(price_2015_dol))
+
+
+
+
