@@ -92,4 +92,43 @@ VALOR_BARRIO_2019 <- DATA_AB2019_corte %>%
   summarise(media_precio=mean(precio3))
 
 
+DATA_NOV2015_corte <- st_join(DATA_NOV2015_corte, BARRIOS)
+
+CANT_BARRIO_2015 <- DATA_NOV2015_corte %>% 
+  group_by(barrio) %>% 
+  summarise(cantidad_2015=n())
+
+VALOR_BARRIO_2019 <- DATA_AB2019_corte %>% 
+  group_by(barrio) %>% 
+  summarise(media_precio=mean(precio3))
+
+DENSIDAD <- CANT_BARRIO_2015 %>% 
+  st_set_geometry(NULL) 
+
+DENSIDAD <- DENSIDAD%>% 
+  left_join(BARRIOS, by="barrio")
+
+DENSIDAD <- DENSIDAD %>% 
+  mutate(densidad=area/cantidad_2015)
+
+DENSIDAD_2019 <- CANT_BARRIO_2019 %>% 
+  st_set_geometry(NULL) %>% 
+  left_join(BARRIOS, by="barrio")
+
+DENSIDAD_2019 <- DENSIDAD_2019 %>% 
+  mutate(densidad=area/cantidad_2019)
+
+ggplot()+
+  geom_sf(data=BARRIOS, fill="gray60")+
+  geom_sf(data=DENSIDAD_2019, aes(fill=densidad))+
+  labs(title = "Densidad de unidades de Airbnb por barrio", 
+       fill = "Densidad", 
+       subtitle =  "Abril 2019",
+       x="Longitud", y="Latitud")+
+  theme(title=element_text(size=8),
+        axis.text=element_text(size=8), axis.title=element_text(size=10),legend.text=element_text(size=10))+
+  scale_fill_viridis_c()
+
+
+
 
